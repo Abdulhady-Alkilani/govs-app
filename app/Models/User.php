@@ -2,47 +2,70 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name', 'email', 'password', 'national_id', 'phone', 'role'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // شكاوى المواطن
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'citizen_id');
+    }
+
+    // الشكاوى المسندة للموظف لمعالجتها
+    public function assignedComplaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'assigned_to');
+    }
+
+    // استعلامات المواطن
+    public function inquiries(): HasMany
+    {
+        return $this->hasMany(Inquiry::class, 'citizen_id');
+    }
+
+    // الاستعلامات المسندة للموظف
+    public function assignedInquiries(): HasMany
+    {
+        return $this->hasMany(Inquiry::class, 'assigned_to');
+    }
+
+    // فواتير المواطن
+    public function bills(): HasMany
+    {
+        return $this->hasMany(Bill::class, 'citizen_id');
+    }
+
+    // إشعارات المستخدم
+    public function customNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // سجل حركات الموظف/المدير
+    public function systemLogs(): HasMany
+    {
+        return $this->hasMany(SystemLog::class);
     }
 }
