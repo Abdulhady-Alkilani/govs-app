@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'national_id', 'phone', 'role'
+        'name', 'email', 'password', 'national_id', 'phone', 'role_id'
     ];
 
     protected $hidden = [
@@ -26,6 +27,25 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+     function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        // التأكد من أن المستخدم يمتلك صلاحية قبل الفحص
+        if (!$this->role) {
+            return false;
+        }
+
+        if ($panel->getId() === 'admin') {
+            return $this->role->name === 'admin';
+        }
+
+        if ($panel->getId() === 'employee') {
+            return $this->role->name === 'employee' || $this->role->name === 'admin'; 
+        }
+
+        return false;
+    }
+
 
     // شكاوى المواطن
     public function complaints(): HasMany
@@ -67,5 +87,11 @@ class User extends Authenticatable
     public function systemLogs(): HasMany
     {
         return $this->hasMany(SystemLog::class);
+    }
+
+    // إضافة علاقة الصلاحية
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 }
