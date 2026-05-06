@@ -23,6 +23,17 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            
+            $user = Auth::user();
+            
+            if ($user->role) {
+                if ($user->role->name === 'admin') {
+                    return redirect('/admin');
+                } elseif ($user->role->name === 'employee') {
+                    return redirect('/employee');
+                }
+            }
+
             return redirect()->intended('/home')->with('success', 'تم تسجيل الدخول بنجاح.');
         }
 
