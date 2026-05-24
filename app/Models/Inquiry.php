@@ -9,7 +9,7 @@ class Inquiry extends Model
 {
     protected $fillable = [
         'citizen_id', 'type_id', 'assigned_to', 
-        'status', 'result_text', 'result_file_path'
+        'status', 'details', 'result_text', 'result_file_path'
     ];
 
     public function citizen(): BelongsTo
@@ -25,5 +25,10 @@ class Inquiry extends Model
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(InquiryAttachment::class);
     }
 }

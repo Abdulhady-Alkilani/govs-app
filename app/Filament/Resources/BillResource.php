@@ -17,73 +17,95 @@ class BillResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'الفواتير';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.bills');
+    }
 
-    protected static ?string $modelLabel = 'فاتورة';
+    public static function getModelLabel(): string
+    {
+        return __('filament.bill.label');
+    }
 
-    protected static ?string $pluralModelLabel = 'الفواتير';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.bill.plural');
+    }
 
-    protected static ?string $navigationLabel = 'الفواتير';
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.bill.nav');
+    }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('الرقم')
+                    ->label(__('filament.col.id'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('citizen.name')
-                    ->label('المواطن')
+                    ->label(__('filament.col.citizen'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('bill_type')
-                    ->label('نوع الفاتورة')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'water' => 'مياه',
-                        'electricity' => 'كهرباء',
-                        'other' => 'أخرى',
+                    ->label(__('filament.col.bill_type'))
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'water' => __('Water Bill'),
+                        'electricity' => __('Electricity Bill'),
+                        'telecom' => __('Telecom Bill'),
+                        'property_tax' => __('Property Tax'),
+                        'traffic_fine' => __('Traffic Fine'),
+                        'late_fine' => __('Late Fine'),
+                        'other' => __('Other'),
                         default => $state,
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label('المبلغ')
+                    ->label(__('filament.col.amount'))
                     ->money('SYP')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.col.status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'unpaid' => 'warning',
                         'paid' => 'success',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'unpaid' => 'غير مدفوعة',
-                        'paid' => 'مدفوعة',
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'unpaid' => __('filament.status.unpaid'),
+                        'paid' => __('filament.status.paid'),
                         default => $state,
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
-                    ->label('تاريخ الاستحقاق')
+                    ->label(__('filament.col.due_date'))
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('paid_at')
-                    ->label('تاريخ الدفع')
+                    ->label(__('filament.col.payment_date'))
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('transaction_id')
-                    ->label('رقم المعاملة')
+                    ->label(__('filament.col.transaction_id'))
                     ->searchable(),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.col.status'))
                     ->options([
-                        'unpaid' => 'غير مدفوعة',
-                        'paid' => 'مدفوعة',
+                        'unpaid' => __('filament.status.unpaid'),
+                        'paid' => __('filament.status.paid'),
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('view_receipt')
+                    ->label(__('filament.action.view_receipt'))
+                    ->icon('heroicon-o-document-magnifying-glass')
+                    ->url(fn($record) => asset('storage/' . $record->payment_receipt_path))
+                    ->openUrlInNewTab()
+                    ->visible(fn($record) => $record->status === 'paid' && !empty($record->payment_receipt_path)),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -98,35 +120,47 @@ class BillResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('citizen_id')
-                    ->label('المواطن')
+                    ->label(__('filament.form.citizen'))
                     ->relationship('citizen', 'name')
                     ->searchable()
                     ->required()
                     ->preload(),
                 Forms\Components\Select::make('bill_type')
-                    ->label('نوع الفاتورة')
+                    ->label(__('filament.col.bill_type'))
                     ->options([
-                        'water' => 'مياه',
-                        'electricity' => 'كهرباء',
-                        'other' => 'أخرى',
+                        'water' => __('Water Bill'),
+                        'electricity' => __('Electricity Bill'),
+                        'telecom' => __('Telecom Bill'),
+                        'property_tax' => __('Property Tax'),
+                        'traffic_fine' => __('Traffic Fine'),
+                        'late_fine' => __('Late Fine'),
+                        'other' => __('Other'),
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('amount')
-                    ->label('المبلغ')
+                    ->label(__('filament.col.amount'))
                     ->numeric()
                     ->required()
-                    ->prefix('ل.س'),
+                    ->prefix(__('SYP')),
                 Forms\Components\Select::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.col.status'))
                     ->options([
-                        'unpaid' => 'غير مدفوعة',
-                        'paid' => 'مدفوعة',
+                        'unpaid' => __('filament.status.unpaid'),
+                        'paid' => __('filament.status.paid'),
                     ])
                     ->required()
                     ->default('unpaid'),
                 Forms\Components\DatePicker::make('due_date')
-                    ->label('تاريخ الاستحقاق')
+                    ->label(__('filament.col.due_date'))
                     ->required(),
+                Forms\Components\FileUpload::make('payment_receipt_path')
+                    ->label(__('filament.form.payment_receipt'))
+                    ->directory('receipts')
+                    ->downloadable()
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf']),
+                Forms\Components\Textarea::make('payment_details')
+                    ->label(__('filament.form.payment_details'))
+                    ->columnSpanFull(),
             ]);
     }
 

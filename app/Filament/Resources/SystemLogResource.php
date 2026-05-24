@@ -15,13 +15,25 @@ class SystemLogResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
 
-    protected static ?string $navigationGroup = 'سجل النظام';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.system_logs');
+    }
 
-    protected static ?string $modelLabel = 'سجل';
+    public static function getModelLabel(): string
+    {
+        return __('filament.system_log.label');
+    }
 
-    protected static ?string $pluralModelLabel = 'سجلات النظام';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.system_log.plural');
+    }
 
-    protected static ?string $navigationLabel = 'سجلات النظام';
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.system_log.nav');
+    }
 
     public static function canCreate(): bool
     {
@@ -33,21 +45,21 @@ class SystemLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('المستخدم')
+                    ->label(__('filament.col.user'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('action')
-                    ->label('الإجراء')
+                    ->label(__('filament.col.action'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('model_type')
-                    ->label('نوع النموذج')
+                    ->label(__('filament.col.model_type'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('model_id')
-                    ->label('رقم النموذج')
+                    ->label(__('filament.col.model_id'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('التاريخ')
+                    ->label(__('filament.col.date'))
                     ->dateTime()
                     ->sortable(),
             ])
@@ -62,26 +74,26 @@ class SystemLogResource extends Resource
         return $form
             ->schema([
                 \Filament\Forms\Components\Placeholder::make('user_name')
-                    ->label('المستخدم')
-                    ->content(fn ($record) => $record->user?->name),
+                    ->label(__('filament.col.user'))
+                    ->content(fn($record) => $record->user?->name),
                 \Filament\Forms\Components\Placeholder::make('action')
-                    ->label('الإجراء')
-                    ->content(fn ($record) => $record->action),
+                    ->label(__('filament.col.action'))
+                    ->content(fn($record) => $record->action),
                 \Filament\Forms\Components\Placeholder::make('model_type')
-                    ->label('نوع النموذج')
-                    ->content(fn ($record) => $record->model_type),
+                    ->label(__('filament.col.model_type'))
+                    ->content(fn($record) => $record->model_type),
                 \Filament\Forms\Components\Placeholder::make('model_id')
-                    ->label('رقم النموذج')
-                    ->content(fn ($record) => $record->model_id),
+                    ->label(__('filament.col.model_id'))
+                    ->content(fn($record) => $record->model_id),
                 \Filament\Forms\Components\Placeholder::make('old_value')
-                    ->label('القيمة القديمة')
-                    ->content(fn ($record) => json_encode($record->old_value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)),
+                    ->label(__('filament.form.old_value'))
+                    ->content(fn($record) => json_encode($record->old_value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)),
                 \Filament\Forms\Components\Placeholder::make('new_value')
-                    ->label('القيمة الجديدة')
-                    ->content(fn ($record) => json_encode($record->new_value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)),
+                    ->label(__('filament.form.new_value'))
+                    ->content(fn($record) => json_encode($record->new_value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)),
                 \Filament\Forms\Components\Placeholder::make('created_at')
-                    ->label('التاريخ')
-                    ->content(fn ($record) => $record->created_at?->format('Y-m-d H:i:s')),
+                    ->label(__('filament.col.date'))
+                    ->content(fn($record) => $record->created_at?->format('Y-m-d H:i:s')),
             ]);
     }
 

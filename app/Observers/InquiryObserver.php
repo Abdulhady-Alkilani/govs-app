@@ -4,6 +4,8 @@ namespace App\Observers;
 
 use App\Models\Inquiry;
 use App\Models\Notification;
+use App\Models\User;
+use Filament\Notifications\Notification as FilamentNotification;
 
 class InquiryObserver
 {
@@ -11,20 +13,35 @@ class InquiryObserver
     {
         if ($inquiry->isDirty('status')) {
             $statusMap = [
-                'pending' => 'قيد الانتظار',
-                'processing' => 'قيد المعالجة',
-                'completed' => 'مكتمل',
-                'rejected' => 'مرفوض',
+                'pending' => __('Pending'),
+                'processing' => __('Processing'),
+                'completed' => __('Completed'),
+                'rejected' => __('Rejected'),
             ];
 
-            $statusAr = $statusMap[$inquiry->status] ?? $inquiry->status;
+            $statusText = $statusMap[$inquiry->status] ?? $inquiry->status;
 
             Notification::create([
                 'user_id' => $inquiry->citizen_id,
-                'title' => 'تحديث حالة الاستعلام',
-                'message' => "تم تحديث حالة استعلامك رقم #{$inquiry->id} إلى: ".$statusAr,
+                'title' => __('Inquiry status updated'),
+                'message' => __('The status of your inquiry #:status has been updated to: :status_text', [
+                    'status' => $inquiry->id,
+                    'status_text' => $statusText,
+                ]),
+                'action_url' => route('inquiries.show', $inquiry->id),
                 'is_read' => false,
             ]);
+
+            $citizen = User::find($inquiry->citizen_id);
+            if ($citizen) {
+                FilamentNotification::make()
+                    ->title(__('Inquiry status updated'))
+                    ->body(__('The status of your inquiry #:status has been updated to: :status_text', [
+                        'status' => $inquiry->id,
+                        'status_text' => $statusText,
+                    ]))
+                    ->sendToDatabase($citizen);
+            }
         }
     }
 }

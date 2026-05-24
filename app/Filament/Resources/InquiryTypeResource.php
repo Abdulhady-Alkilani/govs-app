@@ -16,33 +16,45 @@ class InquiryTypeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?string $navigationGroup = 'أنواع الشكاوى والاستعلامات';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.types');
+    }
 
-    protected static ?string $modelLabel = 'نوع استعلام';
+    public static function getModelLabel(): string
+    {
+        return __('filament.inquiry_type.label');
+    }
 
-    protected static ?string $pluralModelLabel = 'أنواع الاستعلامات';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.inquiry_type.plural');
+    }
 
-    protected static ?string $navigationLabel = 'أنواع الاستعلامات';
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.inquiry_type.nav');
+    }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('الاسم')
+                    ->label(__('filament.col.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->label('الوصف')
+                    ->label(__('filament.col.description'))
                     ->limit(50)
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('نشط')
+                    ->label(__('filament.col.active'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('inquiries_count')
-                    ->label('عدد الاستعلامات')
+                    ->label(__('filament.col.inquiries_count'))
                     ->counts('inquiries')
                     ->sortable(),
             ])
@@ -61,15 +73,15 @@ class InquiryTypeResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('الاسم')
+                    ->label(__('filament.col.name'))
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
-                    ->label('الوصف')
+                    ->label(__('filament.col.description'))
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make('is_active')
-                    ->label('نشط')
+                    ->label(__('filament.col.active'))
                     ->default(true),
             ]);
     }

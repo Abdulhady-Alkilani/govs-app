@@ -20,12 +20,14 @@ class EmployeeStatsOverview extends StatsOverviewWidget
         $completedInquiries = Inquiry::where('assigned_to', $userId)->where('status', 'completed')->count();
 
         return [
-            Stat::make('الطلبات المعلقة', $pendingComplaints + $pendingInquiries)
+            Stat::make(__('Pending Requests'), $pendingComplaints + $pendingInquiries)
                 ->icon('heroicon-o-clock')
-                ->color('warning'),
-            Stat::make('الطلبات المنجزة', $completedComplaints + $completedInquiries)
+                ->color('danger')
+                ->description(__('Pending Requests')),
+            Stat::make(__('Completed Requests'), $completedComplaints + $completedInquiries)
                 ->icon('heroicon-o-check-circle')
-                ->color('success'),
+                ->color('success')
+                ->description(__('Completed Requests')),
         ];
     }
 }

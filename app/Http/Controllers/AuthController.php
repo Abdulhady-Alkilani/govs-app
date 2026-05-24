@@ -23,9 +23,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            
+
             $user = Auth::user();
-            
+
             if ($user->role) {
                 if ($user->role->name === 'admin') {
                     return redirect('/admin');
@@ -34,11 +34,11 @@ class AuthController extends Controller
                 }
             }
 
-            return redirect()->intended('/home')->with('success', 'تم تسجيل الدخول بنجاح.');
+            return redirect()->intended('/home')->with('success', __('Login Successful'));
         }
 
         return back()->withErrors([
-            'national_id' => 'البيانات المدخلة غير صحيحة.',
+            'national_id' => __('Invalid credentials'),
         ])->onlyInput('national_id');
     }
 
@@ -57,21 +57,20 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:15',
         ]);
 
-        // جلب معرف صلاحية المواطن من قاعدة البيانات
         $citizenRole = \App\Models\Role::where('name', 'citizen')->first();
 
         $user = User::create([
             'national_id' => $validated['national_id'],
-            'role_id' => $citizenRole->id, // الاعتماد على الـ ID
+            'role_id' => $citizenRole->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+            'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'],
         ]);
 
         Auth::login($user);
 
-        return redirect('/home')->with('success', 'تم إنشاء الحساب بنجاح.');
+        return redirect('/home')->with('success', __('Account created successfully'));
     }
 
     public function logout(Request $request)
@@ -80,6 +79,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'تم تسجيل الخروج.');
+        return redirect('/')->with('success', __('Logged out successfully'));
     }
 }

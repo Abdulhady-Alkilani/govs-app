@@ -1,18 +1,18 @@
 <x-filament::widget>
     <x-filament::section>
         <x-slot name="heading">
-            أحدث الشكاوى
+            {{ __('filament.widget.latest_complaints') }}
         </x-slot>
 
         <div class="fi-table-wrap">
             <table class="fi-table w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th class="px-4 py-3 text-right font-medium text-gray-500 dark:text-gray-400">#</th>
-                        <th class="px-4 py-3 text-right font-medium text-gray-500 dark:text-gray-400">المواطن</th>
-                        <th class="px-4 py-3 text-right font-medium text-gray-500 dark:text-gray-400">النوع</th>
-                        <th class="px-4 py-3 text-right font-medium text-gray-500 dark:text-gray-400">الحالة</th>
-                        <th class="px-4 py-3 text-right font-medium text-gray-500 dark:text-gray-400">التاريخ</th>
+                        <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">#</th>
+                        <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">{{ __('filament.col.citizen') }}</th>
+                        <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">{{ __('filament.col.type') }}</th>
+                        <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">{{ __('filament.col.status') }}</th>
+                        <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">{{ __('filament.col.date') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,10 +30,10 @@
                                         'rejected' => 'danger',
                                     ];
                                     $statusLabels = [
-                                        'pending' => 'معلق',
-                                        'processing' => 'قيد المعالجة',
-                                        'completed' => 'مكتمل',
-                                        'rejected' => 'مرفوض',
+                                        'pending' => __('filament.status.pending'),
+                                        'processing' => __('filament.status.processing'),
+                                        'completed' => __('filament.status.completed_f'),
+                                        'rejected' => __('filament.status.rejected_f'),
                                     ];
                                     $color = $statusColors[$complaint->status] ?? 'gray';
                                     $label = $statusLabels[$complaint->status] ?? $complaint->status;

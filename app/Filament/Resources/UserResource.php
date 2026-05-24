@@ -17,44 +17,56 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'إدارة المستخدمين';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.user_management');
+    }
 
-    protected static ?string $modelLabel = 'مستخدم';
+    public static function getModelLabel(): string
+    {
+        return __('filament.user.label');
+    }
 
-    protected static ?string $pluralModelLabel = 'المستخدمين';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.user.plural');
+    }
 
-    protected static ?string $navigationLabel = 'المستخدمين';
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.user.nav');
+    }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('national_id')
-                    ->label('الرقم الوطني')
+                    ->label(__('National ID'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('الاسم')
+                    ->label(__('filament.col.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('البريد الإلكتروني')
+                    ->label(__('Email'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->label('الهاتف')
+                    ->label(__('Phone'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role.name')
-                    ->label('الصلاحية')
+                    ->label(__('filament.col.role'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('تاريخ الإنشاء')
+                    ->label(__('filament.col.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('role_id')
-                    ->label('الصلاحية')
+                    ->label(__('filament.col.role'))
                     ->relationship('role', 'name')
                     ->preload(),
             ])
@@ -73,33 +85,33 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('national_id')
-                    ->label('الرقم الوطني')
+                    ->label(__('National ID'))
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('name')
-                    ->label('الاسم')
+                    ->label(__('filament.col.name'))
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
-                    ->label('البريد الإلكتروني')
+                    ->label(__('Email'))
                     ->email()
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('password')
-                    ->label('كلمة المرور')
+                    ->label(__('Password'))
                     ->password()
                     ->revealable()
-                    ->required(fn (string $context): bool => $context === 'create')
-                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn(string $context): bool => $context === 'create')
+                    ->dehydrated(fn($state) => filled($state))
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
-                    ->label('الهاتف')
+                    ->label(__('Phone'))
                     ->tel()
                     ->maxLength(255),
                 Forms\Components\Select::make('role_id')
-                    ->label('الصلاحية')
+                    ->label(__('filament.form.role'))
                     ->relationship('role', 'name')
                     ->required()
                     ->preload(),

@@ -4,6 +4,8 @@ namespace App\Observers;
 
 use App\Models\Complaint;
 use App\Models\Notification;
+use App\Models\User;
+use Filament\Notifications\Notification as FilamentNotification;
 
 class ComplaintObserver
 {
@@ -11,20 +13,35 @@ class ComplaintObserver
     {
         if ($complaint->isDirty('status')) {
             $statusMap = [
-                'pending' => 'قيد الانتظار',
-                'processing' => 'قيد المعالجة',
-                'completed' => 'مكتمل',
-                'rejected' => 'مرفوض',
+                'pending' => __('Pending'),
+                'processing' => __('Processing'),
+                'completed' => __('Completed'),
+                'rejected' => __('Rejected'),
             ];
 
-            $statusAr = $statusMap[$complaint->status] ?? $complaint->status;
+            $statusText = $statusMap[$complaint->status] ?? $complaint->status;
 
             Notification::create([
                 'user_id' => $complaint->citizen_id,
-                'title' => 'تحديث حالة الشكوى',
-                'message' => "تم تحديث حالة شكواك رقم #{$complaint->id} إلى: ".$statusAr,
+                'title' => __('Complaint status updated'),
+                'message' => __('The status of your complaint #:status has been updated to: :status_text', [
+                    'status' => $complaint->id,
+                    'status_text' => $statusText,
+                ]),
+                'action_url' => route('complaints.show', $complaint->id),
                 'is_read' => false,
             ]);
+
+            $citizen = User::find($complaint->citizen_id);
+            if ($citizen) {
+                FilamentNotification::make()
+                    ->title(__('Complaint status updated'))
+                    ->body(__('The status of your complaint #:status has been updated to: :status_text', [
+                        'status' => $complaint->id,
+                        'status_text' => $statusText,
+                    ]))
+                    ->sendToDatabase($citizen);
+            }
         }
     }
 }

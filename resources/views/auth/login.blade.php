@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول</title>
+    <title>{{ __('Login') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -16,8 +16,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
             </div>
-            <h1 class="text-3xl font-bold text-white">الخدمات الحكومية</h1>
-            <p class="text-blue-200 mt-2">تسجيل الدخول إلى حسابك</p>
+            <h1 class="text-3xl font-bold text-white">{{ __('Government Services Portal') }}</h1>
+            <p class="text-blue-200 mt-2">{{ __('Login to your account') }}</p>
         </div>
 
         <div class="bg-white rounded-2xl shadow-2xl p-8">
@@ -41,32 +41,35 @@
                 @csrf
 
                 <div>
-                    <label for="national_id" class="block text-sm font-semibold text-gray-700 mb-2">الرقم الوطني</label>
+                    <label for="national_id" class="block text-sm font-semibold text-gray-700 mb-2">{{ __('National ID') }}</label>
                     <input type="text" id="national_id" name="national_id"
                            value="{{ old('national_id') }}"
                            required
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                           placeholder="أدخل الرقم الوطني">
+                           placeholder="{{ __('Enter your national ID') }}">
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">كلمة المرور</label>
+                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">{{ __('Password') }}</label>
                     <input type="password" id="password" name="password"
                            required
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                           placeholder="أدخل كلمة المرور">
+                           placeholder="{{ __('Enter your password') }}">
                 </div>
 
                 <button type="submit"
                         class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">
-                    تسجيل الدخول
+                    {{ __('Login') }}
                 </button>
             </form>
 
-            <div class="mt-6 text-center">
-                <p class="text-gray-600 text-sm">ليس لديك حساب؟
-                    <a href="{{ route('register') }}" class="text-blue-900 font-semibold hover:underline">إنشاء حساب جديد</a>
+            <div class="mt-6 text-center flex items-center justify-center gap-4">
+                <p class="text-gray-600 text-sm">{{ __("Don't have an account?") }}
+                    <a href="{{ route('register') }}" class="text-blue-900 font-semibold hover:underline">{{ __('Create new account') }}</a>
                 </p>
+                <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="text-sm text-blue-600 hover:underline font-medium">
+                    {{ app()->getLocale() === 'ar' ? 'EN' : 'عربي' }}
+                </a>
             </div>
         </div>
     </div>

@@ -22,6 +22,10 @@ class NotificationController extends Controller
             'is_read' => true
         ]);
 
+        if ($notification->action_url) {
+            return redirect($notification->action_url);
+        }
+
         return back()->with('success', 'تم تحديد الإشعار كمقروء.');
     }
 

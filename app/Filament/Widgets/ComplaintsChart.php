@@ -8,8 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class ComplaintsChart extends ChartWidget
 {
-    protected static ?string $heading = 'الشكاوى الشهرية';
     protected static ?int $sort = 1;
+
+    public function getHeading(): string
+    {
+        return __('filament.widget.monthly_complaints');
+    }
 
     protected function getData(): array
     {
@@ -18,7 +22,7 @@ class ComplaintsChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'الشكاوى الواردة',
+                    'label' => __('filament.widget.incoming_complaints'),
                     'data' => $data->values()->toArray(),
                     'borderColor' => '#f59e0b',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',

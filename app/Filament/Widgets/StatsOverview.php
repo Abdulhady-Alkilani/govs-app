@@ -10,19 +10,22 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverview extends StatsOverviewWidget
 {
-    protected static ?int $sort = 0 ;
+    protected static ?int $sort = 0;
     protected function getStats(): array
     {
         return [
-            Stat::make('إجمالي المستخدمين', User::count())
+            Stat::make(__('Total Users'), User::count())
                 ->icon('heroicon-o-users')
-                ->color('primary'),
-            Stat::make('إجمالي الشكاوى', Complaint::count())
+                ->color('info')
+                ->description(__('Total Citizens')),
+            Stat::make(__('Total Complaints'), Complaint::count())
                 ->icon('heroicon-o-document-text')
-                ->color('warning'),
-            Stat::make('الفواتير المدفوعة', Bill::where('status', 'paid')->count())
+                ->color('danger')
+                ->description(__('Total Complaints')),
+            Stat::make(__('Paid Bills'), Bill::where('status', 'paid')->count())
                 ->icon('heroicon-o-currency-dollar')
-                ->color('success'),
+                ->color('success')
+                ->description(__('Paid Bills')),
         ];
     }
 }

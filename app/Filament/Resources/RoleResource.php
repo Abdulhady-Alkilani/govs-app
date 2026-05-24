@@ -16,27 +16,39 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationGroup = 'إدارة المستخدمين';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.user_management');
+    }
 
-    protected static ?string $modelLabel = 'صلاحية';
+    public static function getModelLabel(): string
+    {
+        return __('filament.role.label');
+    }
 
-    protected static ?string $pluralModelLabel = 'الصلاحيات';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.role.plural');
+    }
 
-    protected static ?string $navigationLabel = 'الصلاحيات';
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.role.nav');
+    }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('الرقم')
+                    ->label(__('filament.col.id'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('الاسم')
+                    ->label(__('filament.col.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')
-                    ->label('عدد المستخدمين')
+                    ->label(__('filament.col.users_count'))
                     ->counts('users')
                     ->sortable(),
             ])
@@ -55,7 +67,7 @@ class RoleResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('اسم الصلاحية')
+                    ->label(__('filament.form.role_name'))
                     ->required()
                     ->maxLength(255),
             ]);
