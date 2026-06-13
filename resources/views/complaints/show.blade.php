@@ -36,6 +36,42 @@
                 <div class="bg-gray-50 rounded-xl p-4 text-gray-800 leading-relaxed whitespace-pre-line">{{ $complaint->description }}</div>
             </div>
 
+            {{-- ===== الميزة 1: عرض تحليل الذكاء الاصطناعي للمواطن ===== --}}
+            @if($complaint->ai_summary || $complaint->ai_priority)
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-5 border border-indigo-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <h3 class="text-sm font-bold text-indigo-800">{{ __('AI Analysis') }}</h3>
+                    </div>
+
+                    @if($complaint->ai_priority)
+                        <div class="mb-3">
+                            <span class="text-xs text-gray-500 font-medium">{{ __('Priority') }}:</span>
+                            @php
+                                $priorityConfig = match($complaint->ai_priority) {
+                                    'high' => ['label' => __('High'), 'emoji' => '🔴', 'class' => 'bg-red-100 text-red-800 border-red-200'],
+                                    'medium' => ['label' => __('Medium'), 'emoji' => '🟡', 'class' => 'bg-yellow-100 text-yellow-800 border-yellow-200'],
+                                    'low' => ['label' => __('Low'), 'emoji' => '⚪', 'class' => 'bg-gray-100 text-gray-800 border-gray-200'],
+                                    default => ['label' => $complaint->ai_priority, 'emoji' => '⚪', 'class' => 'bg-gray-100 text-gray-800 border-gray-200'],
+                                };
+                            @endphp
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border {{ $priorityConfig['class'] }}">
+                                {{ $priorityConfig['emoji'] }} {{ $priorityConfig['label'] }}
+                            </span>
+                        </div>
+                    @endif
+
+                    @if($complaint->ai_summary)
+                        <div>
+                            <span class="text-xs text-gray-500 font-medium">{{ __('Summary') }}:</span>
+                            <p class="text-sm text-indigo-900 mt-1 leading-relaxed">{{ $complaint->ai_summary }}</p>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             @if($complaint->attachments && $complaint->attachments->count() > 0)
                 <div>
                     <p class="text-sm text-gray-500 mb-3">{{ __('Attachments') }}</p>
@@ -45,8 +81,18 @@
                                 $isImage = in_array(strtolower(pathinfo($attachment->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
                             @endphp
                             @if($isImage)
-                                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                                <div class="border border-gray-200 rounded-xl overflow-hidden relative">
                                     <img src="{{ Storage::url($attachment->file_path) }}" alt="{{ __('Attachment') }}" class="w-full h-32 object-cover">
+                                    {{-- ===== الميزة 6: عرض حالة التحقق من المرفق ===== --}}
+                                    @if($attachment->is_ai_verified === true)
+                                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md flex items-center gap-1" title="{{ __('AI Verified Document') }}">
+                                            ✅ {{ __('Verified') }}
+                                        </div>
+                                    @elseif($attachment->is_ai_verified === false)
+                                        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md flex items-center gap-1" title="{{ __('Not a valid document') }}">
+                                            ❌ {{ __('Unverified') }}
+                                        </div>
+                                    @endif
                                 </div>
                             @else
                                 <a href="{{ Storage::url($attachment->file_path) }}" target="_blank"

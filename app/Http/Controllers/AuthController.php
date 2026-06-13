@@ -34,7 +34,7 @@ class AuthController extends Controller
                 }
             }
 
-            return redirect()->intended('/home')->with('success', __('Login Successful'));
+            return redirect('/home')->with('success', __('Login Successful'));
         }
 
         return back()->withErrors([

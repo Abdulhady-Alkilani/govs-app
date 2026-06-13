@@ -37,7 +37,10 @@ class InquiryResource extends Resource
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        return parent::getEloquentQuery()->where('assigned_to', Auth::id());
+        return parent::getEloquentQuery()->where(function ($query) {
+            $query->where('assigned_to', Auth::id())
+                  ->orWhereNull('assigned_to');
+        });
     }
 
     public static function form(Form $form): Form
@@ -128,7 +131,8 @@ class InquiryResource extends Resource
                             ->label(__('ملاحظة سريعة'))
                             ->placeholder(__('اكتب ملاحظة مختصرة وسيقوم الذكاء الاصطناعي بتحويلها لرد رسمي...'))
                             ->rows(3)
-                            ->required(),
+                            ->required()
+                            ->live(),
                         Forms\Components\Textarea::make('official_reply')
                             ->label(__('الرد الرسمي (يُولّد تلقائياً)'))
                             ->placeholder(__('اضغط "توليد الرد" ثم عدّل النص إذا لزم الأمر'))
@@ -138,7 +142,7 @@ class InquiryResource extends Resource
                         $reply = !empty($data['official_reply']) ? $data['official_reply'] : null;
 
                         if (empty($reply) && !empty($data['employee_quick_note'])) {
-                            $reply = \App\Services\AiService::generateOfficialReply($data['employee_quick_note']) ?? $data['employee_quick_note'];
+                            $reply = AiService::generateOfficialReply($data['employee_quick_note']) ?? $data['employee_quick_note'];
                         }
 
                         $record->update([
@@ -155,60 +159,37 @@ class InquiryResource extends Resource
                         Tables\Actions\Action::make('generateAiReply')
                             ->label('🪄 ' . __('توليد رد رسمي'))
                             ->color('warning')
-                            ->action(function () {})
-                            ->extraAttributes([
-                                'x-on:click.prevent' => '
-                                    const quickNote = $wire.mountedTableActionsData[0]?.employee_quick_note;
-                                    if (!quickNote || quickNote.length < 5) {
-                                        new FilamentNotification()
-                                            .title("يرجى كتابة ملاحظة أولاً (5 أحرف على الأقل)")
-                                            .danger()
-                                            .send();
-                                        return;
-                                    }
+                            ->action(function ($livewire) {
+                                $data = $livewire->mountedTableActionsData[0] ?? [];
+                                $quickNote = $data['employee_quick_note'] ?? '';
 
-                                    const btn = $event.target.closest("button");
-                                    const originalText = btn.innerHTML;
-                                    btn.innerHTML = "⏳ جاري التوليد...";
-                                    btn.disabled = true;
+                                if (strlen($quickNote) < 5) {
+                                    Notification::make()
+                                        ->title(__('يرجى كتابة ملاحظة أولاً (5 أحرف على الأقل)'))
+                                        ->danger()
+                                        ->send();
 
-                                    fetch("/ai/generate-reply", {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            "X-CSRF-TOKEN": document.querySelector("meta[name=csrf-token]")?.content || "",
-                                            "Accept": "application/json",
-                                        },
-                                        body: JSON.stringify({ quick_note: quickNote }),
-                                    })
-                                    .then(r => r.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            $wire.mountedTableActionsData[0].official_reply = data.reply;
-                                            $wire.$refresh();
-                                            new FilamentNotification()
-                                                .title("تم توليد الرد بنجاح ✨")
-                                                .success()
-                                                .send();
-                                        } else {
-                                            new FilamentNotification()
-                                                .title("فشل التوليد: " + (data.message || "خطأ غير معروف"))
-                                                .danger()
-                                                .send();
-                                        }
-                                    })
-                                    .catch(err => {
-                                        new FilamentNotification()
-                                            .title("حدث خطأ في الاتصال")
-                                            .danger()
-                                            .send();
-                                    })
-                                    .finally(() => {
-                                        btn.innerHTML = originalText;
-                                        btn.disabled = false;
-                                    });
-                                ',
-                            ]),
+                                    return;
+                                }
+
+                                $reply = AiService::generateOfficialReply($quickNote);
+
+                                if (! $reply) {
+                                    Notification::make()
+                                        ->title(__('فشل توليد الرد. يرجى المحاولة مرة أخرى.'))
+                                        ->danger()
+                                        ->send();
+
+                                    return;
+                                }
+
+                                $livewire->mountedTableActionsData[0]['official_reply'] = $reply;
+
+                                Notification::make()
+                                    ->title(__('تم توليد الرد بنجاح ✨'))
+                                    ->success()
+                                    ->send();
+                            }),
                     ]),
             ]);
     }

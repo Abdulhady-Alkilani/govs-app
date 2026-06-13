@@ -3,12 +3,41 @@
 namespace App\Observers;
 
 use App\Models\Complaint;
-use App\Models\Notification;
 use App\Models\User;
-use Filament\Notifications\Notification as FilamentNotification;
+use App\Services\NotificationService;
 
 class ComplaintObserver
 {
+    public function created(Complaint $complaint): void
+    {
+        $admins = User::whereHas('role', fn($q) => $q->where('name', 'admin'))->get();
+
+        NotificationService::sendToUsers(
+            $admins,
+            __('شكوى جديدة #') . $complaint->id,
+            __('تم تقديم شكوى جديدة من المواطن :name', [
+                'name' => $complaint->citizen?->name ?? 'مواطن',
+            ]),
+            'heroicon-o-exclamation-triangle',
+            'warning',
+            '/admin/complaints/' . $complaint->id . '/edit',
+        );
+
+        if ($complaint->assigned_to) {
+            $employee = User::find($complaint->assigned_to);
+            if ($employee) {
+                NotificationService::sendToUser(
+                    $employee,
+                    __('شكوى جديدة مسندة إليك #') . $complaint->id,
+                    __('تم إسناد شكوى جديدة إليك'),
+                    'heroicon-o-document-text',
+                    'info',
+                    '/employee/complaints/' . $complaint->id . '/edit',
+                );
+            }
+        }
+    }
+
     public function updated(Complaint $complaint): void
     {
         if ($complaint->isDirty('status')) {
@@ -21,26 +50,19 @@ class ComplaintObserver
 
             $statusText = $statusMap[$complaint->status] ?? $complaint->status;
 
-            Notification::create([
-                'user_id' => $complaint->citizen_id,
-                'title' => __('Complaint status updated'),
-                'message' => __('The status of your complaint #:status has been updated to: :status_text', [
-                    'status' => $complaint->id,
-                    'status_text' => $statusText,
-                ]),
-                'action_url' => route('complaints.show', $complaint->id),
-                'is_read' => false,
-            ]);
-
             $citizen = User::find($complaint->citizen_id);
             if ($citizen) {
-                FilamentNotification::make()
-                    ->title(__('Complaint status updated'))
-                    ->body(__('The status of your complaint #:status has been updated to: :status_text', [
-                        'status' => $complaint->id,
+                NotificationService::sendToUser(
+                    $citizen,
+                    __('Complaint status updated'),
+                    __('The status of your complaint #:id has been updated to: :status_text', [
+                        'id' => $complaint->id,
                         'status_text' => $statusText,
-                    ]))
-                    ->sendToDatabase($citizen);
+                    ]),
+                    'heroicon-o-arrow-path',
+                    'info',
+                    route('complaints.show', $complaint->id),
+                );
             }
         }
     }

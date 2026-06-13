@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Inquiry;
 use App\Models\InquiryType;
+use App\Services\AiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class InquiryController extends Controller
 {
@@ -76,11 +78,37 @@ class InquiryController extends Controller
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('inquiry_attachments', 'public');
-                $inquiry->attachments()->create([
+                $attachment = $inquiry->attachments()->create([
                     'file_path' => $path,
                     'file_name' => $file->getClientOriginalName(),
                     'file_type' => $file->getClientMimeType(),
                 ]);
+
+                // ===== الميزة 6: التحقق من المرفقات بالرؤية (Vision AI) =====
+                try {
+                    $isImage = in_array(
+                        strtolower($file->getClientOriginalExtension()),
+                        ['jpg', 'jpeg', 'png']
+                    );
+
+                    if ($isImage) {
+                        $base64Image = base64_encode(file_get_contents($file->getRealPath()));
+                        $mimeType = $file->getClientMimeType();
+                        $verification = AiService::verifyAttachment($base64Image, $mimeType);
+
+                        if ($verification) {
+                            $attachment->update([
+                                'is_ai_verified' => $verification['is_valid'],
+                                'ai_ocr_text' => $verification['extracted_text'] ?? null,
+                            ]);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::error('AI Verification failed for inquiry attachment #' . $attachment->id, [
+                        'error' => $e->getMessage(),
+                    ]);
+                    // لا نوقف عملية الحفظ الأساسية
+                }
             }
         }
 

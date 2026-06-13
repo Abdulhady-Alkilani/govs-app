@@ -34,6 +34,26 @@ class AttachmentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('file_type')
                     ->label(__('filament.col.file_type'))
                     ->searchable(),
+                // ===== الميزة 6: عرض حالة التحقق بالذكاء الاصطناعي =====
+                Tables\Columns\IconColumn::make('is_ai_verified')
+                    ->label(__('تحقق AI'))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-badge')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->default(null)
+                    ->tooltip(fn($record): string => match(true) {
+                        $record->is_ai_verified === true => __('✅ تم التحقق آلياً - وثيقة صالحة'),
+                        $record->is_ai_verified === false => __('❌ لم يتم التحقق - صورة غير مناسبة'),
+                        default => __('⏳ لم يتم الفحص بعد'),
+                    }),
+                Tables\Columns\TextColumn::make('ai_ocr_text')
+                    ->label(__('النص المستخرج'))
+                    ->limit(30)
+                    ->tooltip(fn(?string $state): ?string => $state)
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->placeholder(__('لا يوجد')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.col.upload_date'))
                     ->dateTime()

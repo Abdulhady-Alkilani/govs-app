@@ -66,7 +66,8 @@ class ComplaintController extends Controller
 
         // ===== الميزة 1: التصنيف التلقائي بالذكاء الاصطناعي =====
         try {
-            $classification = AiService::classifyComplaint($request->description);
+            $typeName = ComplaintType::find($request->type_id)?->name;
+            $classification = AiService::classifyComplaint($request->description, $typeName);
             if ($classification) {
                 $complaint->update([
                     'ai_summary' => $classification['summary'],
