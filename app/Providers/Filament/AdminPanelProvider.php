@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandName(fn () => __('Sezerians gov'))
             ->login(RedirectToCentralLogin::class)
             ->colors([
                 'primary' => Color::Blue,

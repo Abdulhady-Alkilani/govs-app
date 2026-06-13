@@ -61,7 +61,7 @@
     "Amount": "Amount",
     "Action": "Action",
     "View Details": "View Details",
-    "View Details / Process": "View Details / Process",
+    "View Details \/ Process": "View Details \/ Process",
     "Mark as Read": "Mark as Read",
     "Mark All as Read": "Mark All as Read",
     "Complaint Type": "Complaint Type",
@@ -91,7 +91,7 @@
     "Download File.": "Download File",
     "Back to Inquiries": "Back to Inquiries",
     "Bill Type": "Bill Type",
-    "Bill Type / Fine": "Bill Type / Fine",
+    "Bill Type \/ Fine": "Bill Type \/ Fine",
     "Choose type...": "Choose type...",
     "Water Bill": "Water Bill",
     "Electricity Bill": "Electricity Bill",
@@ -120,7 +120,7 @@
     "Enter any notes here...": "Enter any notes here...",
     "Confirm & Send Receipt": "Confirm & Send Receipt",
     "Payment Details": "Payment Details",
-    "Notes / Other Details": "Notes / Other Details",
+    "Notes \/ Other Details": "Notes \/ Other Details",
     "Attached Receipt Image": "Attached Receipt Image",
     "View Full Size Receipt": "View Full Size Receipt",
     "Manage Profile": "Manage Profile",
@@ -169,8 +169,8 @@
     "Secure & Reliable Desc": "Advanced protection system for your personal data and financial transactions",
     "Easy to Use": "Easy to Use",
     "Easy to Use Desc": "Simple and clear interface that lets you complete transactions with ease",
-    "24/7 Support": "24/7 Support",
-    "24/7 Support Desc": "Technical support team available around the clock to help you",
+    "24\/7 Support": "24\/7 Support",
+    "24\/7 Support Desc": "Technical support team available around the clock to help you",
     "Fast Processing": "Fast Processing",
     "Fast Processing Desc": "Your transactions are processed as quickly as possible with instant notifications",
     "Total Users": "Total Users",
@@ -181,13 +181,11 @@
     "Notification": "Notification",
     "Total Citizens": "Total Citizens",
     "Enter national ID (11 digits)": "Enter national ID (11 digits)",
-
     "filament.nav.complaints_inquiries": "Complaints & Inquiries",
     "filament.nav.bills": "Bills",
     "filament.nav.user_management": "User Management",
     "filament.nav.types": "Complaint & Inquiry Types",
     "filament.nav.system_logs": "System Logs",
-
     "filament.complaint.label": "Complaint",
     "filament.complaint.plural": "Complaints",
     "filament.complaint.nav": "Complaints",
@@ -214,7 +212,6 @@
     "filament.system_log.nav": "System Logs",
     "filament.attachment.label": "Attachment",
     "filament.attachment.plural": "Attachments",
-
     "filament.col.id": "#",
     "filament.col.citizen": "Citizen",
     "filament.col.type": "Type",
@@ -242,14 +239,12 @@
     "filament.col.file_type": "File Type",
     "filament.col.upload_date": "Upload Date",
     "filament.col.file_name": "File Name",
-
     "filament.status.pending": "Pending",
     "filament.status.processing": "Processing",
     "filament.status.completed_f": "Completed",
     "filament.status.rejected_f": "Rejected",
     "filament.status.unpaid": "Unpaid",
     "filament.status.paid": "Paid",
-
     "filament.form.citizen": "Citizen",
     "filament.form.complaint_type": "Complaint Type",
     "filament.form.inquiry_type": "Inquiry Type",
@@ -267,11 +262,10 @@
     "filament.form.role": "Role",
     "filament.form.old_value": "Old Value",
     "filament.form.new_value": "New Value",
-
     "filament.action.view_receipt": "View Receipt",
     "filament.action.download": "Download",
-
     "filament.widget.monthly_complaints": "Monthly Complaints",
     "filament.widget.incoming_complaints": "Incoming Complaints",
-    "filament.widget.latest_complaints": "Latest Complaints"
+    "filament.widget.latest_complaints": "Latest Complaints",
+    "Laravel": "Sezerians gov"
 }

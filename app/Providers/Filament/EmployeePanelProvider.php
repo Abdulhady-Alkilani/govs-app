@@ -27,6 +27,7 @@ class EmployeePanelProvider extends PanelProvider
         return $panel
             ->id('employee')
             ->path('employee')
+            ->brandName(fn () => __('Sezerians gov'))
             ->login(RedirectToCentralLogin::class)
             ->colors([
                 'primary' => Color::Blue,
