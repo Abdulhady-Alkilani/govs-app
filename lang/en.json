@@ -267,5 +267,14 @@
     "filament.widget.monthly_complaints": "Monthly Complaints",
     "filament.widget.incoming_complaints": "Incoming Complaints",
     "filament.widget.latest_complaints": "Latest Complaints",
+    "filament.filter.created_at": "Created At",
+    "filament.filter.created_from": "From Date",
+    "filament.filter.created_until": "To Date",
+    "filament.filter.assigned_to_me": "Assigned to me",
+    "filament.filter.assigned_to_me.desc": "Show only requests assigned to me",
+    "filament.filter.ai_priority": "AI Priority",
+    "filament.status.priority_high": "High",
+    "filament.status.priority_medium": "Medium",
+    "filament.status.priority_low": "Low",
     "Laravel": "Sezerians gov"
 }

@@ -10,8 +10,12 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class ComplaintResource extends Resource
@@ -156,6 +160,70 @@ class ComplaintResource extends Resource
                     ->dateTime()
                     ->sortable(),
             ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->label(__('filament.col.status'))
+                    ->options([
+                        'pending' => __('filament.status.pending'),
+                        'processing' => __('filament.status.processing'),
+                        'completed' => __('filament.status.completed_f'),
+                        'rejected' => __('filament.status.rejected_f'),
+                    ])
+                    ->default('pending'),
+                SelectFilter::make('ai_priority')
+                    ->label(__('filament.filter.ai_priority'))
+                    ->options([
+                        'high' => __('filament.status.priority_high'),
+                        'medium' => __('filament.status.priority_medium'),
+                        'low' => __('filament.status.priority_low'),
+                    ]),
+                SelectFilter::make('type_id')
+                    ->label(__('filament.col.type'))
+                    ->relationship('type', 'name')
+                    ->preload()
+                    ->searchable(),
+                TernaryFilter::make('assigned_to_me')
+                    ->label(__('filament.filter.assigned_to_me'))
+                    ->placeholder(__('الكل'))
+                    ->trueLabel(__('نعم'))
+                    ->falseLabel(__('لا'))
+                    ->queries(
+                        fn(Builder $query): Builder => $query->where('assigned_to', Auth::id()),
+                        fn(Builder $query): Builder => $query->whereNull('assigned_to'),
+                        fn(Builder $query): Builder => $query,
+                    ),
+                Filter::make('created_at')
+                    ->label(__('filament.filter.created_at'))
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label(__('filament.filter.created_from')),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label(__('filament.filter.created_until')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'] ?? null,
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'] ?? null,
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['created_from'] ?? null) {
+                            $indicators['created_from'] = __('filament.filter.created_from') . ': ' . $data['created_from'];
+                        }
+                        if ($data['created_until'] ?? null) {
+                            $indicators['created_until'] = __('filament.filter.created_until') . ': ' . $data['created_until'];
+                        }
+
+                        return $indicators;
+                    }),
+            ])
+            ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 // ===== الميزة 2: تغيير الحالة والرد بالذكاء الاصطناعي =====

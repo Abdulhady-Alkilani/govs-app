@@ -267,5 +267,14 @@
     "filament.widget.monthly_complaints": "الشكاوى الشهرية",
     "filament.widget.incoming_complaints": "الشكاوى الواردة",
     "filament.widget.latest_complaints": "أحدث الشكاوى",
+    "filament.filter.created_at": "تاريخ الإنشاء",
+    "filament.filter.created_from": "من تاريخ",
+    "filament.filter.created_until": "إلى تاريخ",
+    "filament.filter.assigned_to_me": "المسندة إليّ",
+    "filament.filter.assigned_to_me.desc": "عرض الطلبات المسندة إليّ فقط",
+    "filament.filter.ai_priority": "أولوية الذكاء الاصطناعي",
+    "filament.status.priority_high": "عالية",
+    "filament.status.priority_medium": "متوسطة",
+    "filament.status.priority_low": "منخفضة",
     "Laravel": "Sezerians gov"
 }
