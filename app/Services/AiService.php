@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -12,11 +13,16 @@ class AiService
      */
     public static function chat(string $prompt): ?string
     {
+        set_time_limit(300);
+
         try {
             $response = Http::withHeaders([
                 'x-litellm-api-key' => config('ai.api_key'),
                 'Content-Type' => 'application/json',
-            ])->timeout(30)->post(config('ai.api_url'), [
+            ])
+                ->connectTimeout((int) config('ai.connect_timeout', 30))
+                ->timeout((int) config('ai.timeout', 180))
+                ->post(config('ai.api_url'), [
                 'model' => config('ai.model'),
                 'messages' => [
                     [
@@ -38,6 +44,12 @@ class AiService
             ]);
 
             return null;
+        } catch (ConnectionException $e) {
+            Log::error('AI Service: انتهت مهلة الاتصال (timeout)', [
+                'message' => $e->getMessage(),
+            ]);
+
+            throw new \Exception('انتهت مهلة الاتصال بخدمات الذكاء الاصطناعي بسبب بطء الإنترنت. يرجى المحاولة مرة أخرى.');
         } catch (\Exception $e) {
             Log::error('AI Service Exception', [
                 'message' => $e->getMessage(),
@@ -53,11 +65,16 @@ class AiService
      */
     public static function chatWithImage(string $prompt, string $base64Image, string $mimeType): ?string
     {
+        set_time_limit(300);
+
         try {
             $response = Http::withHeaders([
                 'x-litellm-api-key' => config('ai.api_key'),
                 'Content-Type' => 'application/json',
-            ])->timeout(60)->post(config('ai.api_url'), [
+            ])
+                ->connectTimeout((int) config('ai.connect_timeout', 30))
+                ->timeout((int) config('ai.vision_timeout', 300))
+                ->post(config('ai.api_url'), [
                 'model' => config('ai.model'),
                 'messages' => [
                     [
@@ -90,6 +107,12 @@ class AiService
             ]);
 
             return null;
+        } catch (ConnectionException $e) {
+            Log::error('AI Vision Service: انتهت مهلة الاتصال (timeout)', [
+                'message' => $e->getMessage(),
+            ]);
+
+            throw new \Exception('انتهت مهلة الاتصال بخدمات الذكاء الاصطناعي بسبب بطء الإنترنت. يرجى المحاولة مرة أخرى.');
         } catch (\Exception $e) {
             Log::error('AI Vision Service Exception', [
                 'message' => $e->getMessage(),

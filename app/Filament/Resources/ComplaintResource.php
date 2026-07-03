@@ -158,21 +158,28 @@ class ComplaintResource extends Resource
                             ->rows(5),
                     ])
                     ->action(function (Complaint $record, array $data): void {
-                        $reply = !empty($data['official_reply']) ? $data['official_reply'] : null;
+                        try {
+                            $reply = !empty($data['official_reply']) ? $data['official_reply'] : null;
 
-                        if (empty($reply) && !empty($data['employee_quick_note'])) {
-                            $reply = AiService::generateOfficialReply($data['employee_quick_note']) ?? $data['employee_quick_note'];
+                            if (empty($reply) && !empty($data['employee_quick_note'])) {
+                                $reply = AiService::generateOfficialReply($data['employee_quick_note']) ?? $data['employee_quick_note'];
+                            }
+
+                            $record->update([
+                                'status' => $data['status'],
+                                'internal_notes' => $reply,
+                            ]);
+
+                            Notification::make()
+                                ->title(__('تم تحديث الحالة والرد بنجاح'))
+                                ->success()
+                                ->send();
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title($e->getMessage())
+                                ->danger()
+                                ->send();
                         }
-
-                        $record->update([
-                            'status' => $data['status'],
-                            'internal_notes' => $reply,
-                        ]);
-
-                        Notification::make()
-                            ->title(__('تم تحديث الحالة والرد بنجاح'))
-                            ->success()
-                            ->send();
                     })
                     ->extraModalFooterActions([
                         Tables\Actions\Action::make('generateAiReply')
@@ -191,23 +198,30 @@ class ComplaintResource extends Resource
                                     return;
                                 }
 
-                                $reply = AiService::generateOfficialReply($quickNote);
+                                try {
+                                    $reply = AiService::generateOfficialReply($quickNote);
 
-                                if (! $reply) {
+                                    if (! $reply) {
+                                        Notification::make()
+                                            ->title(__('فشل توليد الرد. يرجى المحاولة مرة أخرى.'))
+                                            ->danger()
+                                            ->send();
+
+                                        return;
+                                    }
+
+                                    $livewire->mountedTableActionsData[0]['official_reply'] = $reply;
+
                                     Notification::make()
-                                        ->title(__('فشل توليد الرد. يرجى المحاولة مرة أخرى.'))
+                                        ->title(__('تم توليد الرد بنجاح ✨'))
+                                        ->success()
+                                        ->send();
+                                } catch (\Exception $e) {
+                                    Notification::make()
+                                        ->title($e->getMessage())
                                         ->danger()
                                         ->send();
-
-                                    return;
                                 }
-
-                                $livewire->mountedTableActionsData[0]['official_reply'] = $reply;
-
-                                Notification::make()
-                                    ->title(__('تم توليد الرد بنجاح ✨'))
-                                    ->success()
-                                    ->send();
                             }),
                     ]),
             ])

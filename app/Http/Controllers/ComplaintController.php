@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Complaint;
 use App\Models\ComplaintType;
 use App\Models\ComplaintAttachment;
-use App\Services\AiService;
+use App\Jobs\ClassifyComplaintJob;
+use App\Jobs\VerifyComplaintAttachmentJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ComplaintController extends Controller
@@ -64,22 +64,8 @@ class ComplaintController extends Controller
             'status' => 'pending',
         ]);
 
-        // ===== الميزة 1: التصنيف التلقائي بالذكاء الاصطناعي =====
-        try {
-            $typeName = ComplaintType::find($request->type_id)?->name;
-            $classification = AiService::classifyComplaint($request->description, $typeName);
-            if ($classification) {
-                $complaint->update([
-                    'ai_summary' => $classification['summary'],
-                    'ai_priority' => $classification['priority'],
-                ]);
-            }
-        } catch (\Exception $e) {
-            Log::error('AI Classification failed for complaint #' . $complaint->id, [
-                'error' => $e->getMessage(),
-            ]);
-            // لا نوقف عملية الحفظ الأساسية
-        }
+        // ===== الميزة 1: التصنيف التلقائي بالذكاء الاصطناعي (في الخلفية) =====
+        ClassifyComplaintJob::dispatch($complaint->id);
 
         // معالجة المرفقات إن وجدت
         if ($request->hasFile('attachments')) {
@@ -93,29 +79,14 @@ class ComplaintController extends Controller
                     'file_type' => $mimeType,
                 ]);
 
-                // ===== الميزة 6: التحقق من المرفقات بالرؤية (Vision AI) =====
-                try {
-                    $isImage = in_array(
-                        strtolower($file->getClientOriginalExtension()),
-                        ['jpg', 'jpeg', 'png']
-                    );
+                // ===== الميزة 6: التحقق من المرفقات بالرؤية (Vision AI) (في الخلفية) =====
+                $isImage = in_array(
+                    strtolower($file->getClientOriginalExtension()),
+                    ['jpg', 'jpeg', 'png']
+                );
 
-                    if ($isImage) {
-                        $base64Image = base64_encode(file_get_contents($file->getRealPath()));
-                        $verification = AiService::verifyAttachment($base64Image, $mimeType);
-
-                        if ($verification) {
-                            $attachment->update([
-                                'is_ai_verified' => $verification['is_valid'],
-                                'ai_ocr_text' => $verification['extracted_text'] ?? null,
-                            ]);
-                        }
-                    }
-                } catch (\Exception $e) {
-                    Log::error('AI Verification failed for attachment #' . $attachment->id, [
-                        'error' => $e->getMessage(),
-                    ]);
-                    // لا نوقف عملية الحفظ الأساسية
+                if ($isImage) {
+                    VerifyComplaintAttachmentJob::dispatch($attachment->id, $path);
                 }
             }
         }

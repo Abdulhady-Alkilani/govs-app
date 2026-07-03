@@ -18,12 +18,19 @@ class AiController extends Controller
             'quick_note' => 'required|string|min:5',
         ]);
 
-        $reply = AiService::generateOfficialReply($request->quick_note);
+        try {
+            $reply = AiService::generateOfficialReply($request->quick_note);
 
-        if (!$reply) {
+            if (!$reply) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('حدث خطأ أثناء توليد الرد. يرجى المحاولة مرة أخرى.'),
+                ], 500);
+            }
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('حدث خطأ أثناء توليد الرد. يرجى المحاولة مرة أخرى.'),
+                'message' => $e->getMessage(),
             ], 500);
         }
 
@@ -43,12 +50,19 @@ class AiController extends Controller
             'text' => 'required|string|min:10',
         ]);
 
-        $enhanced = AiService::enhanceText($request->text);
+        try {
+            $enhanced = AiService::enhanceText($request->text);
 
-        if (!$enhanced) {
+            if (!$enhanced) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('حدث خطأ أثناء تحسين النص. يرجى المحاولة مرة أخرى.'),
+                ], 500);
+            }
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('حدث خطأ أثناء تحسين النص. يرجى المحاولة مرة أخرى.'),
+                'message' => $e->getMessage(),
             ], 500);
         }
 
