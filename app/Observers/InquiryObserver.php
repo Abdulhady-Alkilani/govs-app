@@ -61,7 +61,7 @@ class InquiryObserver
                     ]),
                     'heroicon-o-arrow-path',
                     'success',
-                    route('inquiries.show', $inquiry->id),
+                    route('inquiries.show', $inquiry->id, false),
                 );
             }
         }

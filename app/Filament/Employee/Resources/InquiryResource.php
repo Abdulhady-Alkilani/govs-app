@@ -209,6 +209,7 @@ class InquiryResource extends Resource
                         $record->update([
                             'status' => $data['status'],
                             'result_text' => $reply,
+                            'assigned_to' => Auth::id(),
                         ]);
 
                         Notification::make()

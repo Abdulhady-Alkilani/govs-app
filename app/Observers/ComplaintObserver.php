@@ -61,7 +61,7 @@ class ComplaintObserver
                     ]),
                     'heroicon-o-arrow-path',
                     'info',
-                    route('complaints.show', $complaint->id),
+                    route('complaints.show', $complaint->id, false),
                 );
             }
         }

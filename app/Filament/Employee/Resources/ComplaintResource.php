@@ -262,6 +262,7 @@ class ComplaintResource extends Resource
                         $record->update([
                             'status' => $data['status'],
                             'internal_notes' => $reply,
+                            'assigned_to' => Auth::id(),
                         ]);
 
                         Notification::make()

@@ -43,7 +43,7 @@ class Bill extends Model
                 'user_id' => $bill->citizen_id,
                 'title' => 'لديك فاتورة / غرامة جديدة',
                 'message' => 'تم إصدار مطالبة مالية جديدة لحسابك بنوع: ' . $billTypeName,
-                'action_url' => route('bills.pay', $bill->id),
+                'action_url' => route('bills.pay', $bill->id, false),
             ]);
         });
     }
