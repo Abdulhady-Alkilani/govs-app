@@ -72,6 +72,15 @@
                 </div>
             @endif
 
+            @if($complaint->internal_notes)
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">{{ __('Admin Reply') }}</p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-gray-800 leading-relaxed whitespace-pre-line">
+                        {{ $complaint->internal_notes }}
+                    </div>
+                </div>
+            @endif
+
             @if($complaint->attachments && $complaint->attachments->count() > 0)
                 <div>
                     <p class="text-sm text-gray-500 mb-3">{{ __('Attachments') }}</p>

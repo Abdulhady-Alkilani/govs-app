@@ -33,7 +33,7 @@
 
             @if($inquiry->result_text)
                 <div>
-                    <p class="text-sm text-gray-500 mb-2">{{ __('Inquiry Result') }}</p>
+                    <p class="text-sm text-gray-500 mb-2">{{ __('Admin Reply / Result') }}</p>
                     <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-gray-800 leading-relaxed whitespace-pre-line">
                         {{ $inquiry->result_text }}
                     </div>

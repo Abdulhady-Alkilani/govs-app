@@ -57,8 +57,17 @@
                 </div>
             </div>
 
+            @if($bill->payment_details)
+            <div class="mt-6">
+                <p class="text-sm text-gray-500 mb-2">{{ __('Admin Reply / Details') }}</p>
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-gray-800 leading-relaxed whitespace-pre-line">
+                    {{ $bill->payment_details }}
+                </div>
+            </div>
+            @endif
+
             @if($bill->status == 'paid')
-            <hr class="border-gray-100">
+            <hr class="border-gray-100 mt-6">
             <h3 class="font-bold text-gray-900 text-lg">{{ __('Payment Details') }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
                 <div>
@@ -69,15 +78,6 @@
                     <p class="text-sm text-gray-500 mb-1">{{ __('Payment Date') }}</p>
                     <p class="font-semibold text-gray-900">{{ $bill->paid_at ? $bill->paid_at->format('Y/m/d H:i') : '-' }}</p>
                 </div>
-
-                @if($bill->payment_details)
-                <div class="col-span-1 sm:col-span-2">
-                    <p class="text-sm text-gray-500 mb-2">{{ __('Notes / Other Details') }}</p>
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-800 leading-relaxed whitespace-pre-line">
-                        {{ $bill->payment_details }}
-                    </div>
-                </div>
-                @endif
 
                 @if($bill->payment_receipt_path)
                 <div class="col-span-1 sm:col-span-2">
